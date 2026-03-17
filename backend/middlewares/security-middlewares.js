@@ -5,7 +5,6 @@ import ratelimit from 'express-rate-limit';
 
 export const securityMiddleware = (app) => {
 
-
     // Frontend URLs
     const MAIN_FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
     const ADMIN_FRONTEND_URL = process.env.ADMIN_URL || "http://localhost:5174";

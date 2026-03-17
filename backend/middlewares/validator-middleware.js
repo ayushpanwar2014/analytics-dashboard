@@ -8,7 +8,7 @@ export const validate = (schema) => async (req, res, next) => {
       ...(req.file && { image: req.file }),
     };
 
-    // 🧠 Convert string fields if multipart/form-data (FormData)
+    // Convert string fields if multipart/form-data (FormData)
     if (isMultipart) {
       // Convert boolean fields
       if ('available' in dataToValidate) {
