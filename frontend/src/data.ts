@@ -202,6 +202,7 @@ export const chartBoxProduct = {
     { name: "Sat", products: 450 },
   ],
 };
+
 export const chartBoxRevenue = {
   color: "teal",
   icon: "/revenueIcon.svg",
@@ -219,6 +220,7 @@ export const chartBoxRevenue = {
     { name: "Sat", revenue: 450 },
   ],
 };
+
 export const chartBoxConversion = {
   color: "gold",
   icon: "/conversionIcon.svg",
@@ -308,6 +310,13 @@ export const barChartBoxVisit = {
     },
   ],
 };
+
+export const data = [
+  { name: "Mobile", value: 400, color: "#0088FE" },
+  { name: "Desktop", value: 300, color: "#00C49F" },
+  { name: "Laptop", value: 300, color: "#FFBB28" },
+  { name: "Tablet", value: 200, color: "#FF8042" },
+];
 
 export const userRows = [
   {
