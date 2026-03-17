@@ -201,19 +201,13 @@ export const updateUserProfile = async (req, res, next) => {
             await UserModel.findByIdAndUpdate(userID, {
                 name: name,
                 phone: phone,
-                address: address,
-                dob: dob,
-                gender: gender,
                 image: imageURL
             });
         }
         else {
             await UserModel.findByIdAndUpdate(userID, {
                 name: name,
-                phone: phone,
-                address: address,
-                dob: dob,
-                gender: gender,
+                phone: phone
             });
         }
 
