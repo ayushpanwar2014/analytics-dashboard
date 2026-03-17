@@ -346,26 +346,7 @@ export const products = [
     price: "$899.99",
     createdAt: "01.02.2023",
     inStock: true,
-  },
-  {
-    id: 9,
-    img: "https://img.productz.com/review_image/102489/preview_sony-kdl-50w800b-50-inch-hdtv-review-superb-picture-102489.png",
-    title: "Sony Bravia KDL-47W805A",
-    color: "black",
-    producer: "Sony",
-    price: "$970.49",
-    createdAt: "01.02.2023",
-  },
-  {
-    id: 10,
-    img: "https://venturebeat.com/wp-content/uploads/2015/07/As_AO1-131_gray_nonglare_win10_03.png?fit=1338%2C1055&strip=all",
-    title: "Acer Laptop 16 KL-4804",
-    color: "black",
-    producer: "Acer",
-    price: "$599.99",
-    createdAt: "01.02.2023",
-    inStock: true,
-  },
+  }
 ];
 
 export const singleUser = {

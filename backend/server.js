@@ -12,6 +12,7 @@ import TopDealUserRouter from './src/routes/topDealUser-routes.js';
 import UserAnalyticsRouter from './src/routes/userAnalytics-routes.js';
 import DashboardChartsRouter from './src/routes/dashboard-chart-routes.js';
 import BarChartsRouter from './src/routes/bar-chart-routes.js';
+import ProductsRouter from './src/routes/products-routes.js';
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ app.use("/api/top-deal", TopDealUserRouter);
 app.use("/api/user-analytics", UserAnalyticsRouter);
 app.use("/api/dashboard-charts", DashboardChartsRouter);
 app.use("/api/bar-charts", BarChartsRouter);
+app.use("/api/product", ProductsRouter);
 
 //error middleware
 app.use(errorMiddlewares);
