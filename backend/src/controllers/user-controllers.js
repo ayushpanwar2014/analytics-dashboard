@@ -44,7 +44,7 @@ const authenticateUser = async (req, res, user) => {
 //register
 export const register = async (req, res, next) => {
     try {
-        const { name, email, password } = req.body;
+        const { email, password } = req.body;
 
         //Checking User Exist
         const userExist = await UserModel.findOne({ email: email });
@@ -55,7 +55,6 @@ export const register = async (req, res, next) => {
 
         //Creating User
         const createUser = await UserModel.create({
-            name: name,
             email: email,
             password: password
         });
@@ -163,13 +162,9 @@ export const authUser = async (req, res, next) => {
         const userCopyData = {
             name: response.name,
             email: response.email,
-            gender: response.gender,
             image: response.image,
-            phone: response.phone,
             updatedAt: response.updatedAt,
             createdAt: response.createdAt,
-            address: response.address,
-            dob: response.dob
         };
 
         res.status(200).json({ success: true, data: userCopyData });
@@ -183,41 +178,3 @@ export const authUser = async (req, res, next) => {
         next(error);
     }
 };
-
-//update user profile
-export const updateUserProfile = async (req, res, next) => {
-
-    try {
-        const { userID } = req.user;
-        const { name, phone, address, dob, gender } = req.body;
-
-        const imageFile = req.file;
-
-        if (imageFile) {
-            //image upload in cloudinary
-            const imageUpload = await cloudinary.uploader.upload(imageFile.path, { resource_type: 'image' });
-            const imageURL = imageUpload.secure_url;
-
-            await UserModel.findByIdAndUpdate(userID, {
-                name: name,
-                phone: phone,
-                image: imageURL
-            });
-        }
-        else {
-            await UserModel.findByIdAndUpdate(userID, {
-                name: name,
-                phone: phone
-            });
-        }
-
-        res.status(200).json({ success: true, msg: "User Updated Successfully!" });
-
-    } catch (err) {
-        const error = {
-            status: 401,
-            message: 'UnAuthorized User'
-        };
-        next(error);
-    }
-}
