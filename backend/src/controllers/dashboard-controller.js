@@ -101,3 +101,32 @@ export const seedDashboardCharts = async (req, res, next) => {
         next(err);
     }
 };
+
+export const getDashboardCharts = async (req, res, next) => {
+    try {
+
+        const [usersChart, productsChart, revenueChart, ratioChart] = await Promise.all([
+            DashboardChartModel.findOne({ dataKey: "users" }),
+            DashboardChartModel.findOne({ dataKey: "products" }),
+            DashboardChartModel.findOne({ dataKey: "revenue" }),
+            DashboardChartModel.findOne({ dataKey: "ratio" }),
+        ]);
+
+        res.status(200).json({
+            success: true,
+            data: {
+                users: usersChart,
+                products: productsChart,
+                revenue: revenueChart,
+                ratio: ratioChart,
+            },
+        });
+
+    } catch (error) {
+        const err = {
+            status: 500,
+            message: error.message || "Failed to fetch dashboard charts"
+        };
+        next(err);
+    }
+};

@@ -198,3 +198,23 @@ export const seedUsersAnalytics = async (req, res, next) => {
         next(err);
     }
 };
+
+export const getUsersAnalytics = async (req, res, next) => {
+    try {
+
+        const users = await UserAnalyticsModel.find({});
+
+        res.status(200).json({
+            success: true,
+            count: users.length,
+            data: users,
+        });
+
+    } catch (error) {
+        const err = {
+            status: 500,
+            message: error.message
+        };
+        next(err);
+    }
+};

@@ -66,3 +66,25 @@ export const seedTopDealUsers = async (req, res, next) => {
         next(err);
     }
 };
+
+export const getTopDealUsers = async (req, res, next) => {
+    try {
+
+        const users = await TopDealUser
+            .find({})
+            .sort({ amount: -1 });
+
+        res.status(200).json({
+            success: true,
+            count: users.length,
+            data: users,
+        });
+
+    } catch (error) {
+        const err = {
+            status: 500,
+            message: error.message
+        };
+        next(err);
+    }
+};
