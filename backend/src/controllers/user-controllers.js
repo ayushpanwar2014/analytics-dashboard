@@ -125,56 +125,36 @@ export const logout = async (req, res, next) => {
 export const authUser = async (req, res, next) => {
     try {
 
-        //userId and current sessionID
-        const { userID, _id } = req.user;
+        const { userID } = req.user;
 
-        const response = await UserModel.findById({ _id: userID }).select('-password');
+        const user = await UserModel
+            .findById(userID)
+            .select("-password");
 
-        //creating new accessToken if there is refreshtoken
-        if (!req.cookies.accessToken && req.cookies.refreshToken) {
-
-            //deleting old session for generating new session in database
-            await SessionModel.findByIdAndDelete(_id);
-
-            //creating new session in database
-            const newSession = await response.createSession({ ip: req.ip, userAgent: req.headers["user-agent"] });
-
-            const accessToken = await response.createAccessToken(newSession._id);
-            const refreshToken = await response.createRefreshToken(newSession._id);
-
-            res.cookie('accessToken', accessToken, {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'None',
-                maxAge: accessTokenAge,
-                path: '/',
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                msg: "User not found"
             });
-
-            res.cookie('refreshToken', refreshToken, {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'None',
-                maxAge: refreshTokenAge,
-                path: '/',
-            })
         }
 
         const userCopyData = {
-            name: response.name,
-            email: response.email,
-            image: response.image,
-            updatedAt: response.updatedAt,
-            createdAt: response.createdAt,
+            name: user.name,
+            email: user.email,
+            image: user.image,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
         };
 
-        res.status(200).json({ success: true, data: userCopyData });
+        res.status(200).json({
+            success: true,
+            data: userCopyData,
+        });
 
     } catch (err) {
-
-        const error = {
+        next({
             status: 401,
-            message: 'UnAuthorized User'
-        };
-        next(error);
+            message: "Unauthorized User"
+        });
     }
 };

@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import SessionModel from "../src/models/session-model.js";
-
+import UserModel from "../src/models/user-model.js";
+import { accessTokenAge, refreshTokenAge } from "../src/controllers/user-controllers.js";
 
 //decrypt access or refresh token
 const decodeToken = (token) => {
@@ -15,7 +16,7 @@ export const verifyToken = async (req, res, next) => {
     req.user = null;
 
     if (!accessToken && !refreshToken) {
-        return res.status(400).send({ success: false, msg: "Not Logged In" });
+        return res.status(401).send({ success: false, msg: "Not Logged In" });
     }
     else if (!refreshToken && accessToken) {
 
@@ -67,17 +68,46 @@ export const verifyToken = async (req, res, next) => {
                 req.user = verifyAccessToken;
                 return next();
             } catch (err) {
-                if (err.name === "TokenExpiredError" || refreshToken) {
-                    // Access token expired → use refresh
-                    const session = await refreshTokens(refreshToken);
-                    if (session) {
-                        req.user = session;
-                        return next();
-                    } else {
-                        return res.status(401).json({ success: false, msg: "Invalid refresh token" });
+
+                if (err.name === "TokenExpiredError" && refreshToken) {
+
+                    const decoded = decodeToken(refreshToken);
+
+                    const session = await SessionModel.findById(decoded.session);
+
+                    if (!session) {
+                        return res.status(401).json({ success: false });
                     }
+
+                    const user = await UserModel.findById(session.userID);
+
+                    const newAccessToken = await user.createAccessToken(session._id);
+                    const newRefreshToken = await user.createRefreshToken(session._id);
+
+                    res.cookie("accessToken", newAccessToken, {
+                        httpOnly: true,
+                        secure: true,
+                        sameSite: "None",
+                        maxAge: accessTokenAge,
+                        path: "/",
+                    });
+
+                    res.cookie("refreshToken", newRefreshToken, {
+                        httpOnly: true,
+                        secure: true,
+                        sameSite: "None",
+                        maxAge: refreshTokenAge,
+                        path: "/",
+                    });
+
+                    req.user = {
+                        userID: user._id,
+                        session: session._id,
+                    };
+
+                    return next();
                 }
-                // Any other JWT error
+
                 return res.status(401).json({ success: false, msg: "Invalid access token" });
             }
         }
@@ -85,37 +115,75 @@ export const verifyToken = async (req, res, next) => {
 
             try {
 
-                const UserIdAndSessionId = await refreshTokens(refreshToken);
+                const decoded = decodeToken(refreshToken);
 
-                // Delete old refresh token/session here
-                // await SessionModel.findByIdAndDelete(UserIdAndSessionId._id);
+                const session = await SessionModel.findById(decoded.session);
 
-
-                if (UserIdAndSessionId) {
-                    req.user = UserIdAndSessionId;
-                    next();
+                if (!session) {
+                    return res.status(401).json({
+                        success: false,
+                        msg: "Invalid refresh token"
+                    });
                 }
-                else {
 
-                    // return next()
-                    return res.status(400).send({ success: false, msg: "Not Logged In" });
+                const user = await UserModel.findById(session.userID);
 
+                if (!user) {
+                    return res.status(401).json({
+                        success: false,
+                        msg: "User not found"
+                    });
                 }
+
+                // delete old session
+                await SessionModel.findByIdAndDelete(session._id);
+
+                // create new session
+                const newSession = await user.createSession({
+                    ip: req.ip,
+                    userAgent: req.headers["user-agent"]
+                });
+
+                const newAccessToken = await user.createAccessToken(newSession._id);
+                const newRefreshToken = await user.createRefreshToken(newSession._id);
+
+                res.cookie("accessToken", newAccessToken, {
+                    httpOnly: true,
+                    secure: true,
+                    sameSite: "None",
+                    maxAge: accessTokenAge,
+                    path: "/",
+                });
+
+                res.cookie("refreshToken", newRefreshToken, {
+                    httpOnly: true,
+                    secure: true,
+                    sameSite: "None",
+                    maxAge: refreshTokenAge,
+                    path: "/",
+                });
+
+                req.user = {
+                    userID: user._id,
+                    session: newSession._id
+                };
+
+                return next();
 
             } catch (err) {
 
-                const error = {
-                    status: 404,
-                    message: "Unauthorized Person"
-                }
-
-                res.clearCookie('refreshToken', {
+                res.clearCookie("refreshToken", {
                     httpOnly: true,
                     secure: true,
-                    sameSite: 'None',
-                    path: '/',
+                    sameSite: "None",
+                    path: "/",
                 });
-                next(error)
+
+                return res.status(401).json({
+                    success: false,
+                    msg: "Invalid refresh token"
+                });
+
             }
         }
         else {
@@ -133,43 +201,10 @@ export const verifyToken = async (req, res, next) => {
     }
 }
 
-//checking in refrest token have sessionID to check in datbase and get userID to generate new accesstoken
-const refreshTokens = async (refreshToken) => {
-
-    try {
-
-        const decodedToken = decodeToken(refreshToken);
-
-        if (decodedToken) {
-
-            const currentSession = await SessionModel.findById(decodedToken.session);
-
-            if (currentSession) {
-                return currentSession;
-            }
-            else {
-                throw new Error("Invalid refresh token");
-            }
-
-        }
-        else {
-            // return next()
-            throw new Error("Invalid refresh token");
-        }
-
-    } catch (err) {
-
-        throw new Error("Invalid refresh token");
-
-    }
-
-}
-
 export const verifyRefreshTokenAndLogout = async (req, res, next) => {
 
     const sessionID = req.user._id;
     const sessionID2 = req.user.session;
-
 
     try {
 
@@ -202,4 +237,3 @@ export const verifyRefreshTokenAndLogout = async (req, res, next) => {
     }
 
 }
-
