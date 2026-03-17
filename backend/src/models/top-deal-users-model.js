@@ -27,4 +27,6 @@ const topDealUserSchema = new mongoose.Schema(
     }
 );
 
-export default mongoose.model("TopDealUser", topDealUserSchema);
+const TopDealUser = mongoose.model("TopDealUser", topDealUserSchema);
+
+export default TopDealUser;

@@ -8,6 +8,7 @@ import { connectCloudinary } from './config/cloudinary.js';
 import User_Router from './src/routes/user-routes.js';
 import dotenv from 'dotenv';
 import initRedisClient from './config/redis.js';
+import TopDealUserRouter from './src/routes/topDealUser-routes.js';
 dotenv.config();
 
 // app config
@@ -27,6 +28,7 @@ app.use(morgan('tiny'));
 app.set('trust proxy', false);
 
 app.use('/api/user', User_Router);
+app.use("/api/top-deal", TopDealUserRouter);
 
 //error middleware
 app.use(errorMiddlewares);
@@ -42,5 +44,4 @@ initAPP().then(() => {
     })
 }).catch((err) => {
     console.error('Database Connection Failed!', err);
-
 })
