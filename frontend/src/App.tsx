@@ -1,5 +1,5 @@
 import Home from "./pages/home/Home";
-import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Outlet, Navigate } from "react-router-dom";
 import Users from "./pages/users/Users";
 import Products from "./pages/products/Products";
 import Navbar from "./components/navbar/Navbar";
@@ -9,67 +9,102 @@ import Login from "./pages/login/Login";
 import "./styles/global.scss";
 import User from "./pages/user/User";
 import Product from "./pages/product/Product";
+
 import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
 
+import { AuthProvider, useAuth } from "./context/AuthContext";
+
 const queryClient = new QueryClient();
 
 function App() {
+
   const Layout = () => {
     return (
       <div className="main">
         <Navbar />
+
         <div className="container">
           <div className="menuContainer">
             <Menu />
           </div>
+
           <div className="contentContainer">
-            <QueryClientProvider client={queryClient}>
-              <Outlet />
-            </QueryClientProvider>
+            <Outlet />
           </div>
         </div>
+
         <Footer />
       </div>
     );
   };
 
+  const ProtectedLayout = () => {
+
+    const { user, loading } = useAuth();
+
+    if (loading) return <p>Loading...</p>;
+
+    if (!user) {
+      return <Navigate to="/login" replace />;
+    }
+
+    return <Layout />;
+  };
+
+  const PublicRoute = () => {
+
+    const { user } = useAuth();
+
+    if (user) {
+      return <Navigate to="/" replace />;
+    }
+
+    return <Login />;
+  };
+
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Layout />,
+      element: <ProtectedLayout />,
       children: [
         {
-          path: "/",
+          index: true,
           element: <Home />,
         },
         {
-          path: "/users",
+          path: "users",
           element: <Users />,
         },
         {
-          path: "/products",
+          path: "products",
           element: <Products />,
         },
         {
-          path: "/users/:id",
+          path: "users/:id",
           element: <User />,
         },
         {
-          path: "/products/:id",
+          path: "products/:id",
           element: <Product />,
         },
       ],
     },
     {
       path: "/login",
-      element: <Login />,
+      element: <PublicRoute />,
     },
   ]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </QueryClientProvider>
+  );
 }
 
 export default App;

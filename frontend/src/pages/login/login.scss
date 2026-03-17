@@ -1,0 +1,56 @@
+@import "../../styles/variables.scss";
+
+.login {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $main-bg;
+}
+
+.loginCard {
+    width: 380px;
+    padding: 40px;
+    border-radius: 10px;
+    background: $soft-bg;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.loginCard h2 {
+    text-align: center;
+    color: $main-color;
+}
+
+.loginCard form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.loginCard input {
+    padding: 12px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+    background: $dark-bg;
+    color: $main-color;
+}
+
+.loginCard button {
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #5b8cff;
+    color: white;
+    font-weight: 500;
+}
+
+.loginCard p {
+    text-align: center;
+    font-size: 14px;
+    color: $soft-color;
+    cursor: pointer;
+}
