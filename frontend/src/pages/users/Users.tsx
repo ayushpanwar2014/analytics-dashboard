@@ -3,8 +3,7 @@ import DataTable from "../../components/dataTable/DataTable";
 import "./Users.scss";
 import { useState } from "react";
 import Add from "../../components/add/Add";
-import { userRows } from "../../data";
-// import { useQuery } from "@tanstack/react-query";
+import { useUsersAnalytics } from "../../api/useUsersAnalytics";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 90 },
@@ -57,15 +56,26 @@ const columns: GridColDef[] = [
 const Users = () => {
   const [open, setOpen] = useState(false);
 
-  // TEST THE API
+  const { data, isLoading, isError } = useUsersAnalytics();
 
-  // const { isLoading, data } = useQuery({
-  //   queryKey: ["allusers"],
-  //   queryFn: () =>
-  //     fetch("http://localhost:8800/api/users").then(
-  //       (res) => res.json()
-  //     ),
-  // });
+  if (isLoading) return <p>Loading users...</p>;
+  if (isError) return <p>Error loading users</p>;
+
+  // transform backend data
+  const rows = data.map((user: any) => {
+    const names = user.fullname.split(" ");
+
+    return {
+      id: user._id.slice(-4),
+      img: user.img,
+      firstName: names[0],
+      lastName: names[1],
+      email: user.email,
+      phone: user.phone,
+      createdAt: new Date(user.createdAt).toLocaleDateString(),
+      verified: user.status === "verified",
+    };
+  });
 
   return (
     <div className="users">
@@ -73,14 +83,7 @@ const Users = () => {
         <h1>Users</h1>
         <button onClick={() => setOpen(true)}>Add New User</button>
       </div>
-      <DataTable slug="users" columns={columns} rows={userRows} />
-      {/* TEST THE API */}
-
-      {/* {isLoading ? (
-        "Loading..."
-      ) : (
-        <DataTable slug="users" columns={columns} rows={data} />
-      )} */}
+      <DataTable slug="users" columns={columns} rows={rows} />
       {open && <Add slug="user" columns={columns} setOpen={setOpen} />}
     </div>
   );
