@@ -41,7 +41,8 @@ export const useUserId = (id: string) => {
 
         queryFn: async () => {
             const { data } = await axios.get(
-                `${backendURL}/api/user-analytics/${id}`
+                `${backendURL}/api/user-analytics/${id}`,
+                { withCredentials: true }
             );
 
             if (!data.success) {

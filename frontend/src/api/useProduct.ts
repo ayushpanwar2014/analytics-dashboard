@@ -9,7 +9,8 @@ export const useProduct = (id: string) => {
 
         queryFn: async () => {
             const { data } = await axios.get(
-                `${backendURL}/api/product/${id}`
+                `${backendURL}/api/product/${id}`,
+                { withCredentials: true }
             );
 
             if (!data.success) {
