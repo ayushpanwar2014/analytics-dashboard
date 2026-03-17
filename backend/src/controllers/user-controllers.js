@@ -2,11 +2,44 @@ import SessionModel from "../models/session-model.js";
 import UserModel from "../models/user-model.js";
 import { v2 as cloudinary } from 'cloudinary';
 
-
-
 //setting age for cookies to be expire
 export const accessTokenAge = 1000 * 60 * 15; // 15 mins
 export const refreshTokenAge = 1000 * 60 * 60 * 24 * 7; // 7 days
+
+//creating access Token and refresh Token
+const authenticateUser = async (req, res, user) => {
+
+    //generating session in user Model method
+    const session = await user.createSession({ ip: req.ip, userAgent: req.headers["user-agent"] });
+
+    //create accesstoken with jwt in user Model method
+    const accessToken = await user.createAccessToken(session._id);
+
+    //create refreshtoken with jwt in user Model method
+    const refreshToken = await user.createRefreshToken(session._id);
+
+    //setting cookie becuse more security rather then saving in localstorage
+
+    res.cookie('accessToken', accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'None',
+        maxAge: accessTokenAge,
+        path: '/',
+    });
+
+    res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'None',
+        maxAge: refreshTokenAge,
+        path: '/',
+    }).status(200).json({
+        success: true,
+        msg: "Logged In",
+    });
+
+};
 
 //register
 export const register = async (req, res, next) => {
@@ -149,42 +182,6 @@ export const authUser = async (req, res, next) => {
         };
         next(error);
     }
-};
-
-
-//creating access Token and refresh Token
-const authenticateUser = async (req, res, user) => {
-
-    //generating session in user Model method
-    const session = await user.createSession({ ip: req.ip, userAgent: req.headers["user-agent"] });
-
-    //create accesstoken with jwt in user Model method
-    const accessToken = await user.createAccessToken(session._id);
-
-    //create refreshtoken with jwt in user Model method
-    const refreshToken = await user.createRefreshToken(session._id);
-
-    //setting cookie becuse more security rather then saving in localstorage
-
-    res.cookie('accessToken', accessToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'None',
-        maxAge: accessTokenAge,
-        path: '/',
-    });
-
-    res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'None',
-        maxAge: refreshTokenAge,
-        path: '/',
-    }).status(200).json({
-        success: true,
-        msg: "Logged In",
-    });
-
 };
 
 //update user profile
