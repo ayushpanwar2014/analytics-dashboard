@@ -9,7 +9,8 @@ export const useBigChart = () => {
 
         queryFn: async () => {
             const { data } = await axios.get(
-                `${backendURL}/api/dashboard-charts/get-big-charts`
+                `${backendURL}/api/dashboard-charts/get-big-charts`,
+                { withCredentials: true }
             );
 
             if (!data.success) {

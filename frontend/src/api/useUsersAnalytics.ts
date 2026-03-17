@@ -19,7 +19,8 @@ export const useUsersAnalytics = () => {
 
         queryFn: async () => {
             const { data } = await axios.get(
-                `${backendURL}/api/user-analytics/get-users-analytics`
+                `${backendURL}/api/user-analytics/get-users-analytics`,
+                { withCredentials: true }
             );
 
             if (!data.success) {
