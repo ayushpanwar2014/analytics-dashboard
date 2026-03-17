@@ -36,6 +36,7 @@ export const seedBarCharts = async (req, res, next) => {
         const charts = [barChartBoxRevenue, barChartBoxVisit];
 
         await BarChartModel.deleteMany({});
+
         const insertedCharts = await BarChartModel.insertMany(charts);
 
         res.status(201).json({
@@ -46,6 +47,35 @@ export const seedBarCharts = async (req, res, next) => {
         });
 
     } catch (error) {
-        next(error);
+        const err = {
+            status: 401,
+            message: error.message
+        };
+        next(err);
+    }
+};
+
+export const getBarCharts = async (req, res, next) => {
+    try {
+
+        const [profitChart, visitChart] = await Promise.all([
+            BarChartModel.findOne({ dataKey: "profit" }),
+            BarChartModel.findOne({ dataKey: "visit" }),
+        ]);
+
+        res.status(200).json({
+            success: true,
+            data: {
+                profit: profitChart,
+                visit: visitChart,
+            },
+        });
+
+    } catch (error) {
+        const err = {
+            status: 401,
+            message: error.message
+        };
+        next(err);
     }
 };

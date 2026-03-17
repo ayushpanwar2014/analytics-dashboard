@@ -82,7 +82,7 @@ export const seedUsersAnalytics = async (req, res, next) => {
                 firstName: "Jose",
                 email: "gobtagbes@yahoo.com",
                 phone: "123 456 789",
-                
+
             },
             {
                 img: "https://images.pexels.com/photos/769745/pexels-photo-769745.jpeg?auto=compress&cs=tinysrgb&w=1600",
@@ -191,6 +191,10 @@ export const seedUsersAnalytics = async (req, res, next) => {
         });
 
     } catch (error) {
-        next(error);
+        const err = {
+            status: 401,
+            message: error.message
+        };
+        next(err);
     }
 };

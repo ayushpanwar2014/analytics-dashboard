@@ -48,6 +48,8 @@ export const seedTopDealUsers = async (req, res, next) => {
             },
         ];
 
+        await TopDealUser.deleteMany({});
+
         const insertedUsers = await TopDealUser.insertMany(users);
 
         res.status(201).json({
@@ -57,6 +59,10 @@ export const seedTopDealUsers = async (req, res, next) => {
         });
 
     } catch (error) {
-        next(error);
+        const err = {
+            status: 401,
+            message: error.message
+        };
+        next(err);
     }
 };

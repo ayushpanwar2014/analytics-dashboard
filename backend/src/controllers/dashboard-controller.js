@@ -83,6 +83,7 @@ export const seedDashboardCharts = async (req, res, next) => {
         ];
 
         await DashboardChartModel.deleteMany({});
+
         const insertedCharts = await DashboardChartModel.insertMany(charts);
 
         res.status(201).json({
@@ -93,6 +94,10 @@ export const seedDashboardCharts = async (req, res, next) => {
         });
 
     } catch (error) {
-        next(error);
+        const err = {
+            status: 401,
+            message: error.message
+        };
+        next(err);
     }
 };
