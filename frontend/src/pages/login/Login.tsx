@@ -15,16 +15,18 @@ const Login = () => {
     e.preventDefault();
 
     try {
-
       if (isRegister) {
         await register(email, password);
       } else {
         await login(email, password);
       }
-
-    } catch (err) {
+    } catch (err: any) {
       console.log(err);
-      alert("Authentication failed");
+
+      const message =
+        err?.response?.data?.message || "Authentication failed";
+
+      alert(message);
     }
   };
 
