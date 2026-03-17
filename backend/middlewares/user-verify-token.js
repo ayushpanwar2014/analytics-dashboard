@@ -203,37 +203,30 @@ export const verifyToken = async (req, res, next) => {
 
 export const verifyRefreshTokenAndLogout = async (req, res, next) => {
 
-    const sessionID = req.user._id;
-    const sessionID2 = req.user.session;
+    const sessionId = req.user.session || req.user._id;
 
     try {
 
-        if (sessionID || sessionID2) {
+        const session = await SessionModel.findById(sessionId);
 
-            const checkSessionId = await SessionModel.findById(sessionID || sessionID2);
-
-            if (!checkSessionId) return res.status(401).json({ success: false, msg: "Unauthorized Person" });
-
-            await SessionModel.findByIdAndDelete(checkSessionId._id);
-
-            console.log('Session deleted');
-
-            next();
-
-        }
-        else {
-            return res.status(401).json({ success: false, msg: "Unauthorized Person" });
+        if (!session) {
+            return res.status(401).json({
+                success: false,
+                msg: "Unauthorized Person"
+            });
         }
 
+        await SessionModel.findByIdAndDelete(sessionId);
+
+        next();
 
     } catch (err) {
 
-        const error = {
+        next({
             status: 401,
             message: "Unauthorized Person"
-        }
-        next(error)
+        });
 
     }
 
-}
+};

@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 
 type User = {
-    name: string;
     email: string;
     image?: string;
 };
@@ -23,8 +22,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
-
-    axios.defaults.withCredentials = true;
 
     // check if user already logged in
     const fetchUser = async () => {

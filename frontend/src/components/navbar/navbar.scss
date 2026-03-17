@@ -7,6 +7,18 @@
   align-items: center;
   justify-content: space-between;
 
+  .logoutBtn {
+      background: none;
+      border: none;
+      color: #ddd;
+      cursor: pointer;
+      font-size: 14px;
+    }
+  
+    .logoutBtn:hover {
+      color: white;
+    }
+
   .logo {
     display: flex;
     align-items: center;
