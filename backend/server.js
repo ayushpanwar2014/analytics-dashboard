@@ -4,7 +4,6 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import { errorMiddlewares } from './middlewares/error-middlewares.js';
 import { securityMiddleware } from './middlewares/security-middlewares.js';
-import { connectCloudinary } from './config/cloudinary.js';
 import initRedisClient from './config/redis.js';
 import User_Router from './src/routes/user-routes.js';
 import TopDealUserRouter from './src/routes/topDealUser-routes.js';
@@ -19,7 +18,6 @@ dotenv.config();
 // app config
 const app = express();
 const PORT = process.env.PORT || 7060;
-connectCloudinary();
 
 // Calling advanced security middleware
 securityMiddleware(app);

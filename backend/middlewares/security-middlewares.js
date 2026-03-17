@@ -7,7 +7,6 @@ export const securityMiddleware = (app) => {
 
     // Frontend URLs
     const MAIN_FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
-    const ADMIN_FRONTEND_URL = process.env.ADMIN_URL || "http://localhost:5174";
     const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:3000";
 
     app.use(
@@ -18,16 +17,16 @@ export const securityMiddleware = (app) => {
                     scriptSrc: [
                         "'self'",
                         "'unsafe-inline'",
-                        ...([MAIN_FRONTEND_URL, ADMIN_FRONTEND_URL])
+                        ...([MAIN_FRONTEND_URL])
                     ],
                     connectSrc: [
                         "'self'",
-                        ...([MAIN_FRONTEND_URL, ADMIN_FRONTEND_URL, BACKEND_URL]),
+                        ...([MAIN_FRONTEND_URL, BACKEND_URL]),
                     ],
-                    imgSrc: ["'self'", "data:", MAIN_FRONTEND_URL, ADMIN_FRONTEND_URL],
-                    styleSrc: ["'self'", "'unsafe-inline'", MAIN_FRONTEND_URL, ADMIN_FRONTEND_URL],
-                    fontSrc: ["'self'", MAIN_FRONTEND_URL, ADMIN_FRONTEND_URL],
-                    frameSrc: ["'self'", MAIN_FRONTEND_URL, ADMIN_FRONTEND_URL],
+                    imgSrc: ["'self'", "data:", MAIN_FRONTEND_URL],
+                    styleSrc: ["'self'", "'unsafe-inline'", MAIN_FRONTEND_URL],
+                    fontSrc: ["'self'", MAIN_FRONTEND_URL],
+                    frameSrc: ["'self'", MAIN_FRONTEND_URL],
                 },
             },
             crossOriginResourcePolicy: { policy: "same-origin" },
