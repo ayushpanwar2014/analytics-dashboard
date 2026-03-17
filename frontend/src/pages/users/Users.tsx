@@ -66,7 +66,7 @@ const Users = () => {
     const names = user.fullname.split(" ");
 
     return {
-      id: user._id.slice(-4),
+      id: user._id,
       img: user.img,
       firstName: names[0],
       lastName: names[1],
@@ -81,7 +81,6 @@ const Users = () => {
     <div className="users">
       <div className="info">
         <h1>Users</h1>
-        <button onClick={() => setOpen(true)}>Add New User</button>
       </div>
       <DataTable slug="users" columns={columns} rows={rows} />
       {open && <Add slug="user" columns={columns} setOpen={setOpen} />}

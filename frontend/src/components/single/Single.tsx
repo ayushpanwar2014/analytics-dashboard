@@ -61,6 +61,7 @@ const Single = (props: Props) => {
                 <Legend />
                 {props.chart.dataKeys.map((dataKey) => (
                   <Line
+                    key={dataKey.name}
                     type="monotone"
                     dataKey={dataKey.name}
                     stroke={dataKey.color}

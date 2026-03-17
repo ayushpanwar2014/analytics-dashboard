@@ -1,14 +1,19 @@
+import { useParams } from "react-router-dom";
 import Single from "../../components/single/Single"
-import { singleUser } from "../../data"
 import "./user.scss"
+import { useUserId } from "../../api/useUsersAnalytics";
 
 const User = () => {
+  const { id } = useParams();
 
-  //Fetch data and send to Single Component
-  
+  const { data, isLoading, error } = useUserId(id!);
+
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>User not found</p>;
+
   return (
     <div className="user">
-      <Single {...singleUser}/>
+      <Single {...data} />
     </div>
   )
 }

@@ -34,3 +34,24 @@ export const useUsersAnalytics = () => {
         retry: 2,
     });
 };
+
+export const useUserId = (id: string) => {
+    return useQuery({
+        queryKey: ["userId", id],
+
+        queryFn: async () => {
+            const { data } = await axios.get(
+                `${backendURL}/api/user-analytics/${id}`
+            );
+
+            if (!data.success) {
+                throw new Error("Failed to fetch user");
+            }
+
+            return data.data;
+        },
+
+        enabled: !!id,
+        staleTime: 10 * 1000,
+    });
+};

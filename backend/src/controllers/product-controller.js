@@ -171,3 +171,54 @@ export const getProducts = async (req, res, next) => {
         });
     }
 };
+
+export const getSingleProduct = async (req, res, next) => {
+    try {
+
+        const { id } = req.params;
+
+        const product = await ProductModel.findById(id).lean();
+
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found"
+            });
+        }
+
+        const formattedProduct = {
+            id: product._id,
+            img: product.img,
+            title: product.title,
+
+            info: {
+                productId: product.productId,
+                color: product.color,
+                price: product.price,
+                producer: product.producer,
+                export: product.export
+            },
+
+            chart: {
+                dataKeys: [
+                    { name: "visits", color: "#82ca9d" },
+                    { name: "orders", color: "#8884d8" }
+                ],
+                data: product.chart.data
+            },
+
+            activities: product.activities
+        };
+
+        res.status(200).json({
+            success: true,
+            data: formattedProduct
+        });
+
+    } catch (error) {
+        next({
+            status: 500,
+            message: error.message
+        });
+    }
+};

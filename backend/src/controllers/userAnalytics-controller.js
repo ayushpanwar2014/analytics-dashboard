@@ -218,3 +218,53 @@ export const getUsersAnalytics = async (req, res, next) => {
         next(err);
     }
 };
+
+export const getSingleUserAnalytics = async (req, res, next) => {
+    try {
+
+        const { id } = req.params;
+
+        const user = await UserAnalyticsModel.findById(id).lean();
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        const formattedUser = {
+            id: user._id,
+            img: user.img,
+            title: user.fullname,
+
+            info: {
+                username: user.username,
+                email: user.email,
+                phone: user.phone,
+                status: user.status,
+            },
+
+            chart: {
+                dataKeys: [
+                    { name: "visits", color: "#82ca9d" },
+                    { name: "clicks", color: "#8884d8" },
+                ],
+                data: user.chart.data,
+            },
+
+            activities: user.activities,
+        };
+
+        res.status(200).json({
+            success: true,
+            data: formattedUser,
+        });
+
+    } catch (error) {
+        next({
+            status: 500,
+            message: error.message,
+        });
+    }
+};
