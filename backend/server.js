@@ -10,6 +10,7 @@ import dotenv from 'dotenv';
 import initRedisClient from './config/redis.js';
 import TopDealUserRouter from './src/routes/topDealUser-routes.js';
 import UserAnalyticsRouter from './src/routes/userAnalytics-routes.js';
+import DashboardChartsRouter from './src/routes/dashboard-chart-routes.js';
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.set('trust proxy', false);
 app.use('/api/user', User_Router);
 app.use("/api/top-deal", TopDealUserRouter);
 app.use("/api/user-analytics", UserAnalyticsRouter);
+app.use("/api/dashboard-charts", DashboardChartsRouter);
 
 //error middleware
 app.use(errorMiddlewares);
