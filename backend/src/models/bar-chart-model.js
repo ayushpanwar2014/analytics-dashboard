@@ -39,6 +39,6 @@ const barChartSchema = new mongoose.Schema(
     }
 );
 
-const BarChartModel = mongoose.model("BarChart", barChartSchema);
+const BarChartModel = mongoose.models.BarChart || mongoose.model("BarChart", barChartSchema);
 
 export default BarChartModel;

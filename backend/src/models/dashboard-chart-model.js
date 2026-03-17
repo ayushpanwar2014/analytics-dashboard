@@ -55,6 +55,6 @@ const dashboardChartSchema = new mongoose.Schema(
     }
 );
 
-const DashboardChartModel = mongoose.model("DashboardChart", dashboardChartSchema);
+const DashboardChartModel = mongoose.models.DashboardChart || mongoose.model("DashboardChart", dashboardChartSchema);
 
 export default DashboardChartModel;

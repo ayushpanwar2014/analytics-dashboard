@@ -75,6 +75,6 @@ const userAnalyticsSchema = new mongoose.Schema(
     }
 );
 
-const UserAnalyticsModel = mongoose.model("UserAnalytics", userAnalyticsSchema);
+const UserAnalyticsModel = mongoose.models.UserAnalytics || mongoose.model("UserAnalytics", userAnalyticsSchema);
 
 export default UserAnalyticsModel;
