@@ -5,14 +5,14 @@ import morgan from 'morgan';
 import { errorMiddlewares } from './middlewares/error-middlewares.js';
 import { securityMiddleware } from './middlewares/security-middlewares.js';
 import { connectCloudinary } from './config/cloudinary.js';
-import User_Router from './src/routes/user-routes.js';
-import dotenv from 'dotenv';
 import initRedisClient from './config/redis.js';
+import User_Router from './src/routes/user-routes.js';
 import TopDealUserRouter from './src/routes/topDealUser-routes.js';
 import UserAnalyticsRouter from './src/routes/userAnalytics-routes.js';
 import DashboardChartsRouter from './src/routes/dashboard-chart-routes.js';
 import BarChartsRouter from './src/routes/bar-chart-routes.js';
 import ProductsRouter from './src/routes/products-routes.js';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
