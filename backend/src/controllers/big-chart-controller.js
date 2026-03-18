@@ -1,3 +1,4 @@
+import { getValue, setValue } from "../../config/redis.js";
 import BigChartModel from "../models/bigChartModel.js";
 
 export const seedBigChart = async (req, res, next) => {
@@ -34,7 +35,23 @@ export const seedBigChart = async (req, res, next) => {
 export const getBigChart = async (req, res, next) => {
     try {
 
+        const cacheKey = "bigChart";
+
+        //Check Redis cache
+        const cachedData = await getValue(cacheKey);
+
+        if (cachedData) {
+            console.log("bigChart served from cache");
+
+            return res.status(200).json({
+                success: true,
+                data: cachedData
+            });
+        }
+
         const chartData = await BigChartModel.find().sort({ name: 1 });
+
+        await setValue(cacheKey, chartData, 60);
 
         res.status(200).json({
             success: true,

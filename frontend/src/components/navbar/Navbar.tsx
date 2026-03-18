@@ -18,7 +18,7 @@ const Navbar = () => {
   return (
     <div className="navbar">
       <div className="logo">
-        <span>Admin Dashboard</span>
+        <span>Analytics Dashboard</span>
       </div>
       <div className="icons">
         <img src="/search.svg" alt="" className="icon" />

@@ -1,4 +1,3 @@
-// redisClient.js
 import { createClient } from "redis";
 
 let client;
@@ -13,7 +12,6 @@ export const initRedisClient = async () => {
             host: process.env.REDIS_HOST,
             port: process.env.REDIS_PORT,
             reconnectStrategy: (retries) => {
-                // Quick reconnects (no exponential slowdown)
                 if (retries > 5) return new Error("Redis connection failed");
                 return Math.min(retries * 50, 500);
             },
@@ -25,10 +23,10 @@ export const initRedisClient = async () => {
         console.error("Redis Client Error:", err);
     });
 
-    // ⚡ Connect immediately (skip on-demand connection for speed)
+    //Connect immediately
     if (!client.isOpen) {
         await client.connect();
-        console.log("✅ Redis connected");
+        console.log("Redis connected");
     }
 
     return client;
@@ -38,16 +36,16 @@ export const initRedisClient = async () => {
 process.on("SIGINT", async () => {
     if (client?.isOpen) {
         await client.quit();
-        console.log("🔴 Redis connection closed");
+        console.log("Redis connection closed");
     }
     process.exit(0);
 });
 
-// Store as plain string (stringified JSON) + expiry in one call
-export const setValue = async (key, value) => {
+// Store as plain string expiry in one call
+export const setValue = async (key, value, TTL) => {
     try {
         const redisKey = `users:${key}`;
-        await client.set(redisKey, JSON.stringify(value), { EX: 3600 }); // 3600s = 1 hr
+        await client.set(redisKey, JSON.stringify(value), { EX: TTL });
         return true;
     } catch (error) {
         console.error('Error setting value for key', key, error);

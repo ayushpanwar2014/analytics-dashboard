@@ -1,3 +1,4 @@
+import { getValue, setValue } from "../../config/redis.js";
 import BarChartModel from "../models/bar-chart-model.js";
 
 export const seedBarCharts = async (req, res, next) => {
@@ -58,17 +59,35 @@ export const seedBarCharts = async (req, res, next) => {
 export const getBarCharts = async (req, res, next) => {
     try {
 
+        const cacheKey = "barCharts";
+
+        //Check Redis first
+        const cachedData = await getValue(cacheKey);
+
+        if (cachedData) {
+            console.log('barCharts cached');
+            return res.status(200).json({
+                success: true,
+                data: cachedData
+            });
+        }
+
         const [profitChart, visitChart] = await Promise.all([
             BarChartModel.findOne({ dataKey: "profit" }),
             BarChartModel.findOne({ dataKey: "visit" }),
         ]);
 
+        const responseData = {
+            profit: profitChart,
+            visit: visitChart,
+        };
+
+        //Store in Redis
+        await setValue(cacheKey, responseData, 60);
+
         res.status(200).json({
             success: true,
-            data: {
-                profit: profitChart,
-                visit: visitChart,
-            },
+            data: responseData
         });
 
     } catch (error) {

@@ -1,3 +1,4 @@
+import { getValue, setValue } from "../../config/redis.js";
 import DashboardChartModel from "../models/dashboard-chart-model.js";
 
 export const seedDashboardCharts = async (req, res, next) => {
@@ -105,6 +106,18 @@ export const seedDashboardCharts = async (req, res, next) => {
 export const getDashboardCharts = async (req, res, next) => {
     try {
 
+        const cacheKey = "dashboardCharts";
+
+        const cachedData = await getValue(cacheKey);
+
+        if (cachedData) {
+            console.log("dashboard charts served from cache");
+            return res.status(200).json({
+                success: true,
+                data: cachedData
+            });
+        }
+
         const [usersChart, productsChart, revenueChart, ratioChart] = await Promise.all([
             DashboardChartModel.findOne({ dataKey: "users" }),
             DashboardChartModel.findOne({ dataKey: "products" }),
@@ -112,21 +125,24 @@ export const getDashboardCharts = async (req, res, next) => {
             DashboardChartModel.findOne({ dataKey: "ratio" }),
         ]);
 
+        const responseData = {
+            users: usersChart,
+            products: productsChart,
+            revenue: revenueChart,
+            ratio: ratioChart,
+        };
+
+        await setValue(cacheKey, responseData, 60);
+
         res.status(200).json({
             success: true,
-            data: {
-                users: usersChart,
-                products: productsChart,
-                revenue: revenueChart,
-                ratio: ratioChart,
-            },
+            data: responseData,
         });
 
     } catch (error) {
-        const err = {
+        next({
             status: 500,
             message: error.message || "Failed to fetch dashboard charts"
-        };
-        next(err);
+        });
     }
 };

@@ -1,3 +1,4 @@
+import { getValue, setValue } from "../../config/redis.js";
 import UserAnalyticsModel from "../models/user-analytics-model.js";
 
 export const seedUsersAnalytics = async (req, res, next) => {
@@ -202,7 +203,23 @@ export const seedUsersAnalytics = async (req, res, next) => {
 export const getUsersAnalytics = async (req, res, next) => {
     try {
 
-        const users = await UserAnalyticsModel.find({});
+        const cacheKey = "analytics:users";
+
+        const cachedData = await getValue(cacheKey);
+
+        if (cachedData) {
+            console.log("users analytics served from cache");
+
+            return res.status(200).json({
+                success: true,
+                count: cachedData.length,
+                data: cachedData,
+            });
+        }
+
+        const users = await UserAnalyticsModel.find({}).lean();
+
+        await setValue(cacheKey, users, 60);
 
         res.status(200).json({
             success: true,
@@ -211,11 +228,10 @@ export const getUsersAnalytics = async (req, res, next) => {
         });
 
     } catch (error) {
-        const err = {
+        next({
             status: 500,
             message: error.message
-        };
-        next(err);
+        });
     }
 };
 
@@ -223,6 +239,19 @@ export const getSingleUserAnalytics = async (req, res, next) => {
     try {
 
         const { id } = req.params;
+
+        const cacheKey = `analytics:user:${id}`;
+
+        const cachedData = await getValue(cacheKey);
+
+        if (cachedData) {
+            console.log("single user analytics served from cache");
+
+            return res.status(200).json({
+                success: true,
+                data: cachedData,
+            });
+        }
 
         const user = await UserAnalyticsModel.findById(id).lean();
 
@@ -255,6 +284,8 @@ export const getSingleUserAnalytics = async (req, res, next) => {
 
             activities: user.activities,
         };
+
+        await setValue(cacheKey, formattedUser, 60);
 
         res.status(200).json({
             success: true,

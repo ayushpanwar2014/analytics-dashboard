@@ -1,4 +1,5 @@
 import TopDealUser from "../models/top-deal-users-model.js";
+import { getValue, setValue } from "../../config/redis.js";
 
 export const seedTopDealUsers = async (req, res, next) => {
     try {
@@ -70,9 +71,23 @@ export const seedTopDealUsers = async (req, res, next) => {
 export const getTopDealUsers = async (req, res, next) => {
     try {
 
-        const users = await TopDealUser
-            .find({})
-            .sort({ amount: -1 });
+        const cacheKey = "topDealUsers";
+
+        const cachedData = await getValue(cacheKey);
+
+        if (cachedData) {
+            console.log("topDealUsers served from cache");
+
+            return res.status(200).json({
+                success: true,
+                count: cachedData.length,
+                data: cachedData
+            });
+        }
+
+        const users = await TopDealUser.find({})
+
+        await setValue(cacheKey, users, 60);
 
         res.status(200).json({
             success: true,
@@ -81,10 +96,9 @@ export const getTopDealUsers = async (req, res, next) => {
         });
 
     } catch (error) {
-        const err = {
+        next({
             status: 500,
             message: error.message
-        };
-        next(err);
+        });
     }
 };

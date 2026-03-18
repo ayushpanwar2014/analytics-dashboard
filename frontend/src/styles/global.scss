@@ -12,6 +12,10 @@ a {
   color: inherit;
 }
 
+body{
+  background-color: $main-bg;
+}
+
 .main {
   font-family: "Inter", sans-serif;
   background-color: $main-bg;

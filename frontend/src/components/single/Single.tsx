@@ -29,7 +29,6 @@ const Single = (props: Props) => {
           <div className="topInfo">
             {props.img && <img src={props.img} alt="" />}
             <h1>{props.title}</h1>
-            <button>Update</button>
           </div>
           <div className="details">
             {Object.entries(props.info).map((item) => (

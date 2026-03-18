@@ -1,3 +1,4 @@
+import { getValue, setValue } from "../../config/redis.js";
 import ProductModel from "../models/product-model.js";
 
 export const seedProducts = async (req, res, next) => {
@@ -145,10 +146,24 @@ export const seedProducts = async (req, res, next) => {
 export const getProducts = async (req, res, next) => {
     try {
 
+        const cacheKey = "products:list";
+
+        const cachedData = await getValue(cacheKey);
+
+        if (cachedData) {
+            console.log("products served from cache");
+
+            return res.status(200).json({
+                success: true,
+                count: cachedData.length,
+                data: cachedData
+            });
+        }
+
         const products = await ProductModel.find({}).lean();
 
         const formattedProducts = products.map((product) => ({
-            id: product._id, // required for MUI DataGrid
+            id: product._id,
             img: product.img,
             title: product.title,
             color: product.color,
@@ -157,6 +172,8 @@ export const getProducts = async (req, res, next) => {
             inStock: product.inStock,
             createdAt: product.createdAt,
         }));
+
+        await setValue(cacheKey, formattedProducts, 60);
 
         res.status(200).json({
             success: true,
@@ -176,6 +193,19 @@ export const getSingleProduct = async (req, res, next) => {
     try {
 
         const { id } = req.params;
+
+        const cacheKey = `product:${id}`;
+
+        const cachedData = await getValue(cacheKey);
+
+        if (cachedData) {
+            console.log("single product served from cache");
+
+            return res.status(200).json({
+                success: true,
+                data: cachedData
+            });
+        }
 
         const product = await ProductModel.findById(id).lean();
 
@@ -209,6 +239,8 @@ export const getSingleProduct = async (req, res, next) => {
 
             activities: product.activities
         };
+
+        await setValue(cacheKey, formattedProduct, 60);
 
         res.status(200).json({
             success: true,
