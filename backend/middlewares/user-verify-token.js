@@ -187,7 +187,6 @@ export const verifyToken = async (req, res, next) => {
             }
         }
         else {
-            // return next()
             return res.status(400).send({ success: false, msg: "Not Logged In" });
         }
 
