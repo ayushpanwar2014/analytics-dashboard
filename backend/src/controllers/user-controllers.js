@@ -50,7 +50,10 @@ export const register = async (req, res, next) => {
         const userExist = await UserModel.findOne({ email: email });
 
         if (userExist) {
-            return res.status(404).json({ success: false, msg: "User already exists!" });
+            return res.status(409).json({
+                success: false,
+                message: "User already exists!"
+            });
         }
 
         //Creating User
@@ -80,13 +83,23 @@ export const login = async (req, res, next) => {
         //checking if user exist in database
         const userExist = await UserModel.findOne({ email: email });
 
-        if (!userExist) return res.status(404).json({ success: false, msg: "Invalid Credentials!" });
+        if (!userExist) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid Credentials!"
+            });
+        }
 
         //Comaparing User Password
         const validPassword = await userExist.comparePassword(password);
 
-        if (!validPassword) return res.status(401).json({ success: false, msg: "Invalid Credentials!" })
-
+        if (!validPassword) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid Credentials!"
+            });
+        }
+        
         // creating access token and refresh token and sending to client
         await authenticateUser(req, res, userExist);
 

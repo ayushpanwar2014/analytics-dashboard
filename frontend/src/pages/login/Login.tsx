@@ -24,7 +24,9 @@ const Login = () => {
       console.log(err);
 
       const message =
-        err?.response?.data?.message || "Authentication failed";
+        err?.response?.data?.msg ||
+        err?.response?.data?.message ||
+        "Authentication failed";
 
       alert(message);
     }
